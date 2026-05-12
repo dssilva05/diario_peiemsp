@@ -1,6 +1,6 @@
 {
-  "name": "Diário EMSP",
-  "short_name": "Diário EMSP",
+  "name": "Diário PEI - EMSP",
+  "short_name": "Diário PEI - EMSP",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0d47a1",

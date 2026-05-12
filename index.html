@@ -635,8 +635,8 @@
         // Campo de referência (quem relatou)
         document.getElementById('tipoRegistroContainer').insertAdjacentHTML('afterend', `
             <div id="containerRefProf" style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ffeeba;">
-                <label style="margin-top:0; color: #856404; font-weight:bold;">📋 Relato em nome do Prof:</label>
-                <input type="text" id="profReferencia" list="listaProfessores" placeholder="Selecione o professor (opcional)" style="background: white; border: 1px solid #856404; width:100%; padding:10px; border-radius:8px; box-sizing:border-box;">
+                <label style="margin-top:0; color: #856404; font-weight:bold;">📋 Relato em nome do Monitor:</label>
+                <input type="text" id="profReferencia" list="listaProfessores" placeholder="Selecione o monitor (opcional)" style="background: white; border: 1px solid #856404; width:100%; padding:10px; border-radius:8px; box-sizing:border-box;">
                 <small style="color:#856404;">O nome selecionado aparecerá no início do relato.</small>
             </div>
         `);
@@ -783,7 +783,7 @@ async function gravarOcorrencia() {
     let profRef = "";
     const inputRef = document.getElementById('profReferencia'); 
     if (inputRef && inputRef.value.trim() !== "") {
-        profRef = `(Prof: ${inputRef.value.trim()}) `;
+        profRef = `(Monitor(a): ${inputRef.value.trim()}) `;
     }
 
     // Concatena tudo com segurança para o campo de texto

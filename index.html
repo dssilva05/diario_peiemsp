@@ -675,34 +675,6 @@
         cont.classList.remove('hidden');
     }
 
-    // 5. Trava do Select de Tipos de Registro
-    const selTipo = document.getElementById('selTipoRegistro');
-    if (selTipo) {
-        if (cargoLogado === "Professor") {
-            selTipo.innerHTML = `
-                <option value="📝 Ocorrência Disciplinar">📝 Ocorrência Disciplinar</option>
-                <option value="📚 Ocorrência Pedagógica">📚 Ocorrência Pedagógica</option>
-                <option value="🏥 Saúde (Doente / Machucou)">🏥 Saúde (Doente / Machucou)</option>
-            `;
-        } else if (cargoLogado === "AEE") {
-            selTipo.innerHTML = `
-                <option value="♿ Atendimento AEE">♿ Atendimento AEE</option>
-                <option value="📝 Ocorrência Disciplinar">📝 Ocorrência Disciplinar</option>
-                <option value="📚 Ocorrência Pedagógica">📚 Ocorrência Pedagógica</option>
-            `;
-        } else {
-            selTipo.innerHTML = `
-                <option value="📝 Ocorrência Disciplinar">📝 Ocorrência Disciplinar</option>
-                <option value="📚 Ocorrência Pedagógica">📚 Ocorrência Pedagógica</option>
-                <option value="👪 Reunião com a Família">👪 Reunião com a Família</option>
-                <option value="🏥 Saúde (Doente / Machucou)">🏥 Saúde (Doente / Machucou)</option>
-                <option value="🧠 Equipe PAS">🧠 Equipe PAS</option>
-                <option value="♿ Atendimento AEE">♿ Atendimento AEE</option>
-                <option value="📎 Outros Atendimentos">📎 Outros Atendimentos</option>
-            `;
-        }
-    }
-
     // 6. Controle de Visibilidade de Telas e Abas
     document.getElementById('secaoAcesso').classList.add('hidden');
     document.getElementById('conteudoDiario').classList.remove('hidden');

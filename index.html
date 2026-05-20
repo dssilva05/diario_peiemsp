@@ -252,7 +252,7 @@
         <button id="t1" class="tab-btn active" onclick="tab(1)">📝 INCLUIR</button>
         <button id="t2" class="tab-btn" onclick="tab(2)">🔍 CONSULTAR</button>
         <button id="t3" class="tab-btn" onclick="tab(3)">📊 ALERTAS</button>
-        <button id="t5" class="tab-btn hidden" onclick="tab(5)">👨‍🏫 ATENDIMENTO MONITOR</button>
+        <button id="t5" class="tab-btn hidden" onclick="tab(5)">👨‍🏫 ATENDIMENTO PROF</button>
         <button id="t4" class="tab-btn hidden" onclick="tab(4)">👥 CADASTRO</button>                                                          
         <button onclick="logout()" style="background:none; color:white; flex:0.3; cursor:pointer">Sair</button>
     </div>
@@ -303,6 +303,7 @@
     <option value="[📱 Uso indevido do celular] ">📱 Uso indevido do celular</option>
     <option value="[🪑 Não respeitou o mapeamento] ">🪑 Não respeitou o mapeamento</option>
     <option value="[💢 Agressão ao colega] ">💢 Agressão ao colega</option>
+    <option value="[​🤝 Atendimento à família] ">​🤝 Atendimento à família</option>
 </select>
 
 <label id="labelRelato">Descrição complementar (Opcional):</label>
@@ -445,7 +446,7 @@
 </div>
     
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvK7bSx-Ot1UB4ssVUzEKoeh_d0e6VuTkkxtX48mwVrrT_kSBuQiQkVA5diaGzLCHprg/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlVbz3C-bdKUbRvuWx4SrL9eiFdmyRwwZwUYVhi9u8u2df9NSgNRNjsYx7gD5q1qef7g/exec";
     let ALUNOS = {};
     let cargoLogado = "", profNomeLogado = "", disciplinaLogada = "", idEditando = null;
 
@@ -635,8 +636,8 @@
         // Campo de referência (quem relatou)
         document.getElementById('tipoRegistroContainer').insertAdjacentHTML('afterend', `
             <div id="containerRefProf" style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ffeeba;">
-                <label style="margin-top:0; color: #856404; font-weight:bold;">📋 Relato em nome do Monitor:</label>
-                <input type="text" id="profReferencia" list="listaProfessores" placeholder="Selecione o monitor (opcional)" style="background: white; border: 1px solid #856404; width:100%; padding:10px; border-radius:8px; box-sizing:border-box;">
+                <label style="margin-top:0; color: #856404; font-weight:bold;">📋 Relato em nome do Prof:</label>
+                <input type="text" id="profReferencia" list="listaProfessores" placeholder="Selecione o professor (opcional)" style="background: white; border: 1px solid #856404; width:100%; padding:10px; border-radius:8px; box-sizing:border-box;">
                 <small style="color:#856404;">O nome selecionado aparecerá no início do relato.</small>
             </div>
         `);
@@ -652,12 +653,22 @@
                     <option value="Advertência Verbal">Advertência Verbal</option>
                     <option value="Advertência por Escrito">Advertência por Escrito</option>
                     <option value="Família Convocada">Família Convocada</option>
+                    <option value="Atendimento à família">Atendimento à família</option>
                     <option value="Encaminhamento PAS">Encaminhamento PAS</option>
                 </select>
                 <div id="divDataConvocacao" style="display:none; margin-top:10px;">
-                    <label>📅 Data da Reunião:</label>
-                    <input type="date" id="dataConvocacao" style="width:100%;">
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label>📅 Data da Reunião:</label>
+                            <input type="date" id="dataConvocacao" style="width:100%;">
+                        </div>
+                    <div style="flex: 1;">
+                        <label>⏰ Horário:</label>
+                            <input type="time" id="horarioConvocacao" style="width:100%; margin-top: 8px; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 15px;">
+                        </div>
+                    </div>
                 </div>
+                
                 <label style="display:block; margin-top:15px;">🔒 Relato Interno (Privado):</label>
                 <textarea id="relatoGestaoTexto" rows="3" style="width:100%;" placeholder="Anotações da gestão..."></textarea>
             </div>`;
@@ -758,13 +769,18 @@ async function carregarDatalistProfessores() {
 }
 
     function atualizarAlunos(idT, idA) {
-        const t = document.getElementById(idT).value, s = document.getElementById(idA);
-        s.innerHTML = '<option value="">-- Selecione --</option>';
-        if(ALUNOS[t]) {
-            s.add(new Option("👥 TODA A TURMA", "TODA A TURMA"));
-            ALUNOS[t].forEach(al => s.add(new Option(al, al)));
-        }
+    const t = document.getElementById(idT).value, s = document.getElementById(idA);
+    s.innerHTML = '<option value="">-- Selecione --</option>';
+    
+    if(ALUNOS[t]) {
+        s.add(new Option("👥 TODA A TURMA", "TODA A TURMA"));
+        
+        // Criamos uma cópia da lista e aplicamos a ordem alfabética antes de exibir
+        const alunosOrdenados = [...ALUNOS[t]].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+        
+        alunosOrdenados.forEach(al => s.add(new Option(al, al)));
     }
+}
 
 async function gravarOcorrencia() {
     const tVal = document.getElementById('selTurma').value;
@@ -783,7 +799,7 @@ async function gravarOcorrencia() {
     let profRef = "";
     const inputRef = document.getElementById('profReferencia'); 
     if (inputRef && inputRef.value.trim() !== "") {
-        profRef = `(Monitor(a): ${inputRef.value.trim()}) `;
+        profRef = `(Prof: ${inputRef.value.trim()}) `;
     }
 
     // Concatena tudo com segurança para o campo de texto
@@ -802,7 +818,9 @@ async function gravarOcorrencia() {
             tratativaFinal = selT.value;
             if (tratativaFinal === "Família Convocada" && dtC && dtC.value) {
                 const dataFormatada = dtC.value.split('-').reverse().join('/');
-                tratativaFinal += ` (Data: ${dataFormatada})`;
+                const horaVal = document.getElementById('horarioConvocacao').value;
+                const horaFormatada = horaVal ? ` às ${horaVal}` : '';
+            tratativaFinal += ` (Data: ${dataFormatada}${horaFormatada})`;
             }
         } else {
             tratativaFinal = window.tratativaAntiga || "";
@@ -1048,10 +1066,22 @@ async function gravarOcorrencia() {
             let textoExibicao = textoTratativaBruto;
             let avisoDataReuniao = "";
 
+            // Lógica para extrair Data e Horário salvos na string da Tratativa
             if (textoTratativaBruto.includes("(Data:")) {
                 const matchData = textoTratativaBruto.match(/\d{2}\/\d{2}\/\d{4}/);
+                // Procura por um padrão de horário como "14:30" ou "08:00"
+                const matchHora = textoTratativaBruto.match(/\d{2}:\d{2}/);
+                
                 if (matchData) {
-                    avisoDataReuniao = `<p style="color:#e65100; font-weight:bold; margin-top:5px; margin-bottom:0;">📅 Reunião: ${matchData[0]}</p>`;
+                    let detalheAgenda = `📅 Data: ${matchData[0]}`;
+                    if (matchHora) {
+                        detalheAgenda += ` | ⏰ Horário: ${matchHora[0]}`;
+                    }
+                    
+                    // Cria uma etiqueta em destaque vermelho/laranja para a reunião agendada
+                    avisoDataReuniao = `<div style="background:#fff3cd; color:#d32f2f; border:1px solid #ffeeba; padding:8px; border-radius:6px; font-weight:bold; margin-top:8px; display:inline-block; font-size:12px;">⚠️ REUNIÃO AGENDADA -> ${detalheAgenda}</div>`;
+                    
+                    // Limpa o texto bruto para exibição na linha comum da ação da gestão
                     textoExibicao = textoTratativaBruto.replace(/\s\(Data:.*?\)/g, "");
                 }
             }
@@ -1135,8 +1165,16 @@ async function gravarOcorrencia() {
                 </select>
 
                 <div id="divDataConvocacao" style="display:none; margin-top:10px;">
-                    <label>📅 Data da Reunião:</label>
-                    <input type="date" id="dataConvocacao" style="width:100%;">
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label>📅 Data da Reunião:</label>
+                            <input type="date" id="dataConvocacao" style="width:100%;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label>⏰ Horário:</label>
+                            <input type="time" id="horarioConvocacao" style="width:100%; margin-top: 8px; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 15px;">
+                        </div>
+                    </div>
                 </div>
 
                 <label style="display:block; margin-top:15px;">🔒 Relato Interno (Privado):</label>
@@ -1153,6 +1191,11 @@ async function gravarOcorrencia() {
             if (opcaoLimpa === "Família Convocada") {
                 document.getElementById('divDataConvocacao').style.display = 'block';
                 document.getElementById('dataConvocacao').value = dataParaInput;
+                
+                const extrairHora = tratativa.match(/\d{2}:\d{2}/);
+                if (extrairHora) {
+                    document.getElementById('horarioConvocacao').value = extrairHora[0];
+                }
             }
             document.getElementById('selTratativa').focus();
         }, 50);
@@ -1370,6 +1413,7 @@ function renderPizza(obj, titulo) {
         if(document.getElementById('relatoGestaoTexto')) document.getElementById('relatoGestaoTexto').value = "";
         if(document.getElementById('divDataConvocacao')) document.getElementById('divDataConvocacao').style.display = "none";
         if(document.getElementById('dataConvocacao')) document.getElementById('dataConvocacao').value = "";
+        if(document.getElementById('horarioConvocacao')) document.getElementById('horarioConvocacao').value = "";
     } else {
         // Se for professor comum, remove o bloco completamente
         cont.innerHTML = "";
@@ -1425,14 +1469,21 @@ function renderPizza(obj, titulo) {
 }
 
     function carregarListaTransferencia() {
-        const selTransferir = document.getElementById('selectAlunoTransferir');
-        selTransferir.innerHTML = '<option value="">Selecione o aluno...</option>';
-        Object.keys(ALUNOS).sort().forEach(turma => {
-            ALUNOS[turma].forEach(aluno => {
-                selTransferir.add(new Option(`${aluno} (${turma})`, `${aluno}|${turma}`));
-            });
+    const selTransferir = document.getElementById('selectAlunoTransferir');
+    selTransferir.innerHTML = '<option value="">Selecione o aluno...</option>';
+    
+    // Organiza as turmas primeiro
+    const turmas = Object.keys(ALUNOS).sort();
+    
+    turmas.forEach(turma => {
+        // Organiza os alunos daquela turma antes de adicionar no seletor
+        const alunosDaTurma = [...ALUNOS[turma]].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+        
+        alunosDaTurma.forEach(aluno => {
+            selTransferir.add(new Option(`${aluno} (${turma})`, `${aluno}|${turma}`));
         });
-    }
+    });
+}
 
     async function salvarNovoAluno() {
         const nome = document.getElementById('novoAlunoNome').value.trim().toUpperCase();
@@ -1509,23 +1560,26 @@ function renderPizza(obj, titulo) {
 function prepararEdicaoFeedback(id, professor, data, relato) {
     idFeedbackEditando = id;
     
-    // Preenche os campos do formulário no topo da aba 5
+    // Preenche os campos do formulário no topo
     document.getElementById('feedbackProfNome').value = professor;
     
-    // Converte data dd/mm/aaaa para yyyy-mm-dd para o input date
+    // Converte data dd/mm/aaaa para yyyy-mm-dd
     const partes = data.split('/');
     if(partes.length === 3) {
         document.getElementById('feedbackData').value = `${partes[2]}-${partes[1]}-${partes[0]}`;
     }
     
+    // Coloca o texto no campo de mensagem
     document.getElementById('feedbackTexto').value = relato;
     
-    // Altera o botão para modo de edição
+    // Muda visualmente o botão de salvar
     const btn = document.querySelector("#aba5 .btn-main");
-    btn.innerText = "💾 Salvar Alterações";
-    btn.style.background = "#ef6c00";
+    if (btn) {
+        btn.innerText = "💾 Salvar Alterações";
+        btn.style.background = "#ef6c00";
+    }
     
-    // Rola para o topo do formulário
+    // Rola a tela para cima para você ver o formulário preenchido
     document.getElementById('aba5').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -1605,7 +1659,6 @@ function renderizarFeedbacks(dados) {
     }
 
     let html = "";
-    // i=0 é o cabeçalho, os dados começam em i=1
     for (let i = 1; i < dados.length; i++) {
         const id = dados[i][0];
         const profAlvo = dados[i][1];
@@ -1613,11 +1666,14 @@ function renderizarFeedbacks(dados) {
         const dataStr = dados[i][3];
         const relato = dados[i][4];
 
+        // Usamos uma técnica mais segura para passar o texto do relato para o botão
+        const relatoSeguro = encodeURIComponent(relato);
+
         html += `
         <div class="item-ocorrencia" style="border-left: 5px solid #1976d2; position: relative; margin-bottom:15px;">
             <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
-                <button onclick="prepararEdicaoFeedback('${id}', '${profAlvo}', '${dataStr}', \`${relato}\`)" 
-                        style="background:orange; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px;">
+                <button onclick="prepararEdicaoFeedback('${id}', '${profAlvo}', '${dataStr}', \`${relato}\` )" 
+                    style="background:orange; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px;">
                     Editar
                 </button>
                 <button onclick="excluirFeedback('${id}')" 
